@@ -8,15 +8,11 @@ on:
 
 jobs:
   build:
-
-    strategy:
-      matrix:
-        configuration: [Debug, Release]
-
     runs-on: windows-latest
 
     env:
       Solution_Name: HardLevel PS2 App.sln
+      Configuration: Release  # Agora fixo em Release
 
     steps:
     - name: Checkout
@@ -31,14 +27,14 @@ jobs:
       uses: microsoft/setup-msbuild@v2
 
     - name: Restore NuGet packages
-      run: msbuild "$env:Solution_Name" /t:Restore /p:Configuration=${{ matrix.configuration }}
+      run: msbuild "$env:Solution_Name" /t:Restore /p:Configuration=$env:Configuration
 
     - name: Build solution
-      run: msbuild "$env:Solution_Name" /p:Configuration=${{ matrix.configuration }}
+      run: msbuild "$env:Solution_Name" /p:Configuration=$env:Configuration
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
         name: Build
         path: |
-          **\bin\${{ matrix.configuration }}\
+          **\bin\Release\
