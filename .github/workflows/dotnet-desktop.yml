@@ -1,9 +1,7 @@
-name: .NET Build
+name: .NET Build and Package
 
 on:
   push:
-    branches: [ "master" ]
-  pull_request:
     branches: [ "master" ]
 
 jobs:
@@ -12,10 +10,10 @@ jobs:
 
     env:
       Solution_Name: HardLevel PS2 App.sln
-      Configuration: Release  # Agora fixo em Release
+      Configuration: Release
 
     steps:
-    - name: Checkout
+    - name: Checkout repository
       uses: actions/checkout@v4
 
     - name: Setup .NET
@@ -27,14 +25,28 @@ jobs:
       uses: microsoft/setup-msbuild@v2
 
     - name: Restore NuGet packages
-      run: msbuild "$env:Solution_Name" /t:Restore /p:Configuration=$env:Configuration
+      run: msbuild "$env:Solution_Name" /t:Restore /p:Configuration=${{ env.Configuration }}
 
     - name: Build solution
-      run: msbuild "$env:Solution_Name" /p:Configuration=$env:Configuration
+      run: msbuild "$env:Solution_Name" /p:Configuration=${{ env.Configuration }}
 
-    - name: Upload build artifacts
+    - name: Install 7-Zip
+      run: |
+        choco install 7zip -y
+
+    - name: Create Release ZIP with Comment
+      run: |
+        $outputPath = "build_output"
+        New-Item -ItemType Directory -Path $outputPath
+        Copy-Item -Path "**\bin\${{ env.Configuration }}\**" -Destination $outputPath -Recurse
+
+        $comment = Get-Content ".\hardlevel.txt" | Out-String
+        echo $comment > comment.txt
+
+        7z a Release.zip "$outputPath\*" -mx=9 -scsUTF-8 -mcu -mmt -sccUTF-8 -zcomment.txt
+
+    - name: Upload Release ZIP
       uses: actions/upload-artifact@v4
       with:
-        name: Build
-        path: |
-          **\bin\Release\
+        name: Release
+        path: Release.zip
