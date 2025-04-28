@@ -1,19 +1,15 @@
-name: .NET Build and Package
+name: .NET Build
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master"]
 
 jobs:
   build:
     runs-on: windows-latest
 
-    env:
-      Solution_Name: HardLevel PS2 App.sln
-      Configuration: Release
-
     steps:
-    - name: Checkout repository
+    - name: Checkout
       uses: actions/checkout@v4
 
     - name: Setup .NET
@@ -25,32 +21,31 @@ jobs:
       uses: microsoft/setup-msbuild@v2
 
     - name: Restore NuGet packages
-      run: msbuild "$env:Solution_Name" /t:Restore /p:Configuration=${{ env.Configuration }}
+      run: msbuild "$env:Solution_Name" /t:Restore /p:Configuration=Release
 
     - name: Build solution
-      run: msbuild "$env:Solution_Name" /p:Configuration=${{ env.Configuration }}
+      run: msbuild "$env:Solution_Name" /p:Configuration=Release
 
-    - name: Install zip
-      run: choco install zip -y
+    - name: Get commit count as version
+      id: get_commit_count
+      run: echo "VERSION=v1.0.$(git rev-list --count HEAD)" >> $GITHUB_ENV
 
-    - name: Create Release ZIP with Comment
-      run: |
-        $outputPath = "build_output"
-        New-Item -ItemType Directory -Path $outputPath
-        Copy-Item -Path "**\bin\${{ env.Configuration }}\**" -Destination $outputPath -Recurse
+    - name: Create Release
+      id: create_release
+      uses: gh-actions/create-release@v1
+      with:
+        tag_name: ${{ env.VERSION }}  # Usando a versão gerada a partir dos commits
+        release_name: "Release ${{ env.VERSION }}"
+        body: "Release baseado no commit count: ${{ env.VERSION }}"
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-        # Adiciona o comentário do arquivo hardlevel.txt
-        $comment = Get-Content ".\hardlevel.txt" | Out-String
-        $comment | Set-Content -Path "$outputPath\comment.txt"
-
-        # Cria o arquivo ZIP com todos os arquivos (exceto o próprio ZIP)
-        cd $outputPath
-        zip -r ../Release.zip *
-
-    - name: Upload Release ZIP to GitHub Releases
+    - name: Upload files as release assets
       uses: actions/upload-release-asset@v1
       with:
-        upload_url: ${{ github.event.release.upload_url }}
-        asset_path: Release.zip
-        asset_name: Release.zip
-        asset_content_type: application/zip
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./path/to/your/file.zip  # Caminho do arquivo que você quer fazer upload
+        asset_name: "Release-${{ env.VERSION }}.zip"  # Nome do arquivo no release
+        asset_content_type: "application/zip"
