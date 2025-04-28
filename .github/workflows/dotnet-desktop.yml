@@ -34,7 +34,7 @@ jobs:
       run: |
         choco install 7zip -y
 
-    - name: Create Release ZIP with Comment
+    - name: Create Release ZIP
       run: |
         $outputPath = "build_output"
         New-Item -ItemType Directory -Path $outputPath
@@ -43,7 +43,12 @@ jobs:
         $comment = Get-Content ".\hardlevel.txt" | Out-String
         echo $comment > comment.txt
 
-        7z a Release.zip "$outputPath\*" -mx=9 -scsUTF-8 -mcu -mmt -sccUTF-8 -zcomment.txt
+        7z a Release.zip "$outputPath\*" -mx=9 -scsUTF-8 -mcu -mmt -sccUTF-8
+
+    - name: Add comment to ZIP file
+      run: |
+        $comment = Get-Content ".\hardlevel.txt" | Out-String
+        7z u Release.zip -z$comment
 
     - name: Upload Release ZIP
       uses: actions/upload-artifact@v4
