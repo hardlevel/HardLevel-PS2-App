@@ -48,7 +48,8 @@ jobs:
         git tag $env:VERSION
         git push origin $env:VERSION
 
-    - name: Create release
+    - name: Create GitHub Release
+      id: create_release   # 👈 IMPORTANTE: Damos um ID pra capturar o upload_url
       uses: softprops/action-gh-release@v2
       with:
         tag_name: ${{ env.VERSION }}
@@ -63,5 +64,7 @@ jobs:
       uses: softprops/action-gh-release@v2
       with:
         files: Release.zip
+        # 👇 Diz para fazer upload para o release já criado
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
