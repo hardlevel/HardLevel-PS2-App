@@ -37,6 +37,9 @@ jobs:
 
     - name: Compress build into zip
       run: Compress-Archive -Path "**\\bin\\Release\\*" -DestinationPath "Release.zip"
+      
+    - name: List files (debugging step)
+      run: dir # Lista todos os arquivos no diretório atual para verificar se o Release.zip existe
 
     - name: Configure Git
       run: |
