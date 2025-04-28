@@ -8,10 +8,6 @@ on:
 
 jobs:
   build:
-    strategy:
-      matrix:
-        configuration: [Debug, Release]
-
     runs-on: windows-latest
 
     env:
@@ -30,10 +26,10 @@ jobs:
       uses: microsoft/setup-msbuild@v2
 
     - name: Restore NuGet packages
-      run: msbuild "$env:Solution_Name" /t:Restore /p:Configuration=${{ matrix.configuration }}
+      run: msbuild "$env:Solution_Name" /t:Restore /p:Configuration=Release
 
     - name: Build solution
-      run: msbuild "$env:Solution_Name" /p:Configuration=${{ matrix.configuration }}
+      run: msbuild "$env:Solution_Name" /p:Configuration=Release
 
     - name: Set version as current date
       run: echo "VERSION=$(date +'%Y%m%d')" >> $GITHUB_ENV
@@ -43,7 +39,7 @@ jobs:
       with:
         name: Build
         path: |
-          **\bin\${{ matrix.configuration }}\
+          **\bin\Release\
 
     - name: Create release
       uses: softprops/action-gh-release@v1
