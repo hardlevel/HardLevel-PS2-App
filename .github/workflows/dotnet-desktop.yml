@@ -3,7 +3,7 @@ name: .NET Build
 on:
   push:
     branches: [ "master" ]
-    
+
 jobs:
   build:
     runs-on: windows-latest
@@ -42,8 +42,10 @@ jobs:
         path: |
           **\bin\Release\
 
-    - name: Create tag
+    - name: Create and push tag
       run: |
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git config --global user.name "github-actions[bot]"
         git tag ${{ env.VERSION }}
         git push origin ${{ env.VERSION }}
 
