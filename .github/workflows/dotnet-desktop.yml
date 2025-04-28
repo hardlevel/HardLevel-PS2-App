@@ -42,27 +42,27 @@ jobs:
         path: |
           **\bin\Release\
 
-    - name: Create and push tag
-      run: |
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        git config --global user.name "github-actions[bot]"
-        git tag ${{ env.VERSION }}
-        git push origin ${{ env.VERSION }}
+    # - name: Create and push tag
+    #   run: |
+    #     git config --global user.email "github-actions[bot]@users.noreply.github.com"
+    #     git config --global user.name "github-actions[bot]"
+    #     git tag ${{ env.VERSION }}
+    #     git push origin ${{ env.VERSION }}
 
-    - name: Create release
-      uses: softprops/action-gh-release@v1
-      with:
-        tag_name: ${{ env.VERSION }}
-        name: Release ${{ env.VERSION }}
-        body: 'Automated release generated from GitHub Actions.'
-        draft: false
-        prerelease: false
-        token: ${{ secrets.GITHUB_TOKEN }}
+    # - name: Create release
+    #   uses: softprops/action-gh-release@v1
+    #   with:
+    #     tag_name: ${{ env.VERSION }}
+    #     name: Release ${{ env.VERSION }}
+    #     body: 'Automated release generated from GitHub Actions.'
+    #     draft: false
+    #     prerelease: false
+    #     token: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Upload release asset
-      uses: actions/upload-release-asset@v1
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: Release.zip
-        asset_name: Release-${{ env.VERSION }}.zip
-        asset_content_type: application/zip
+    # - name: Upload release asset
+    #   uses: actions/upload-release-asset@v1
+    #   with:
+    #     upload_url: ${{ steps.create_release.outputs.upload_url }}
+    #     asset_path: Release.zip
+    #     asset_name: Release-${{ env.VERSION }}.zip
+    #     asset_content_type: application/zip
