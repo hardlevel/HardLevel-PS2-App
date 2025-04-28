@@ -39,11 +39,16 @@ jobs:
         path: |
           **\bin\Release\
 
+    - name: Create tag
+      run: |
+        git tag ${{ env.VERSION }}
+        git push origin ${{ env.VERSION }}
+
     - name: Create release
       uses: softprops/action-gh-release@v1
       with:
         tag_name: ${{ env.VERSION }}
-        name: Release ${{ env.VERSION }}  # 'name' agora está correto
+        name: Release ${{ env.VERSION }}
         body: 'Automated release generated from GitHub Actions.'
         draft: false
         prerelease: false
