@@ -39,15 +39,18 @@ jobs:
         New-Item -ItemType Directory -Path $outputPath
         Copy-Item -Path "**\bin\${{ env.Configuration }}\**" -Destination $outputPath -Recurse
 
-        # Add the comment from hardlevel.txt
+        # Adiciona o comentário do arquivo hardlevel.txt
         $comment = Get-Content ".\hardlevel.txt" | Out-String
-        $comment | Set-Content -Path "comment.txt"
+        $comment | Set-Content -Path "$outputPath\comment.txt"
 
-        # Create the ZIP with the comment
-        zip -r Release.zip $outputPath/* -c comment.txt
+        # Cria o arquivo ZIP com todos os arquivos (exceto o próprio ZIP)
+        cd $outputPath
+        zip -r ../Release.zip *
 
-    - name: Upload Release ZIP
-      uses: actions/upload-artifact@v4
+    - name: Upload Release ZIP to GitHub Releases
+      uses: actions/upload-release-asset@v1
       with:
-        name: Release
-        path: Release.zip
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: Release.zip
+        asset_name: Release.zip
+        asset_content_type: application/zip
