@@ -30,25 +30,21 @@ jobs:
     - name: Build solution
       run: msbuild "$env:Solution_Name" /p:Configuration=${{ env.Configuration }}
 
-    - name: Install 7-Zip
-      run: |
-        choco install 7zip -y
+    - name: Install zip
+      run: choco install zip -y
 
-    - name: Create Release ZIP
+    - name: Create Release ZIP with Comment
       run: |
         $outputPath = "build_output"
         New-Item -ItemType Directory -Path $outputPath
         Copy-Item -Path "**\bin\${{ env.Configuration }}\**" -Destination $outputPath -Recurse
 
+        # Add the comment from hardlevel.txt
         $comment = Get-Content ".\hardlevel.txt" | Out-String
-        echo $comment > comment.txt
+        $comment | Set-Content -Path "comment.txt"
 
-        7z a Release.zip "$outputPath\*" -mx=9 -scsUTF-8 -mcu -mmt -sccUTF-8
-
-    - name: Add comment to ZIP file
-      run: |
-        $comment = Get-Content ".\hardlevel.txt" | Out-String
-        7z u Release.zip -z$comment
+        # Create the ZIP with the comment
+        zip -r Release.zip $outputPath/* -c comment.txt
 
     - name: Upload Release ZIP
       uses: actions/upload-artifact@v4
