@@ -3,10 +3,13 @@ name: .NET Build
 on:
   push:
     branches: [ "master" ]
-
+    
 jobs:
   build:
     runs-on: windows-latest
+
+    permissions:
+      contents: write  # Permite que o bot de ações crie tags
 
     env:
       Solution_Name: HardLevel PS2 App.sln
