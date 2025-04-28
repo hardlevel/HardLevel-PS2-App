@@ -32,18 +32,21 @@ jobs:
     - name: Build solution
       run: msbuild "$env:Solution_Name" /p:Configuration=Release
 
-    - name: Set version as current date
-      run: echo "VERSION=$(date +'%Y%m%d')" >> $GITHUB_ENV
+    - name: Set version based on current date and time
+      run: echo "VERSION=$(Get-Date -Format 'yyyyMMddTHHmmss')" >> $env:GITHUB_ENV
 
     - name: Compress build into zip
       run: Compress-Archive -Path "**\\bin\\Release\\*" -DestinationPath "Release.zip"
 
-    - name: Create and push tag
+    - name: Configure Git
       run: |
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
         git config --global user.name "github-actions[bot]"
-        git tag ${{ env.VERSION }}
-        git push origin ${{ env.VERSION }}
+
+    - name: Create and push tag
+      run: |
+        git tag $env:VERSION
+        git push origin $env:VERSION
 
     - name: Create release
       uses: softprops/action-gh-release@v2
