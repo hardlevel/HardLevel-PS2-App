@@ -1,15 +1,15 @@
-name: .NET Build
+name: .NET Build and Release
 
 on:
   push:
     branches: [ "master" ]
 
 jobs:
-  build:
+  build-and-release:
     runs-on: windows-latest
 
     permissions:
-      contents: write  # Permite que o bot de ações crie tags
+      contents: write  # Permite criar tags e releases
 
     env:
       Solution_Name: HardLevel PS2 App.sln
@@ -35,34 +35,30 @@ jobs:
     - name: Set version as current date
       run: echo "VERSION=$(date +'%Y%m%d')" >> $GITHUB_ENV
 
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
+    - name: Compress build into zip
+      run: Compress-Archive -Path "**\\bin\\Release\\*" -DestinationPath "Release.zip"
+
+    - name: Create and push tag
+      run: |
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git config --global user.name "github-actions[bot]"
+        git tag ${{ env.VERSION }}
+        git push origin ${{ env.VERSION }}
+
+    - name: Create release
+      uses: softprops/action-gh-release@v2
       with:
-        name: Build
-        path: |
-          **\bin\Release\
+        tag_name: ${{ env.VERSION }}
+        name: Release ${{ env.VERSION }}
+        body: 'Automated release generated from GitHub Actions.'
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    # - name: Create and push tag
-    #   run: |
-    #     git config --global user.email "github-actions[bot]@users.noreply.github.com"
-    #     git config --global user.name "github-actions[bot]"
-    #     git tag ${{ env.VERSION }}
-    #     git push origin ${{ env.VERSION }}
-
-    # - name: Create release
-    #   uses: softprops/action-gh-release@v1
-    #   with:
-    #     tag_name: ${{ env.VERSION }}
-    #     name: Release ${{ env.VERSION }}
-    #     body: 'Automated release generated from GitHub Actions.'
-    #     draft: false
-    #     prerelease: false
-    #     token: ${{ secrets.GITHUB_TOKEN }}
-
-    # - name: Upload release asset
-    #   uses: actions/upload-release-asset@v1
-    #   with:
-    #     upload_url: ${{ steps.create_release.outputs.upload_url }}
-    #     asset_path: Release.zip
-    #     asset_name: Release-${{ env.VERSION }}.zip
-    #     asset_content_type: application/zip
+    - name: Upload release asset
+      uses: softprops/action-gh-release@v2
+      with:
+        files: Release.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
