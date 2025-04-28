@@ -36,10 +36,17 @@ jobs:
       run: echo "VERSION=$(Get-Date -Format 'yyyyMMddTHHmmss')" >> $env:GITHUB_ENV
 
     - name: Compress build into zip
-      run: Compress-Archive -Path "**\\bin\\Release\\*" -DestinationPath "Release.zip"
-      
+      run: |
+        # Verifica se a pasta bin\Release existe
+        if (Test-Path "bin\Release") {
+            Compress-Archive -Path "bin\\Release\\*" -DestinationPath "Release.zip"
+        } else {
+            Write-Host "Pasta bin\\Release não encontrada. Verifique se a compilação foi realizada corretamente."
+            exit 1
+        }
+  
     - name: List files (debugging step)
-      run: dir # Lista todos os arquivos no diretório atual para verificar se o Release.zip existe
+      run: dir # Lista os arquivos no diretório atual para garantir que o Release.zip existe
 
     - name: Configure Git
       run: |
