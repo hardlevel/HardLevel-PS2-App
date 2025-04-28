@@ -26,17 +26,17 @@ jobs:
     - name: Build solution
       run: msbuild "$env:Solution_Name" /p:Configuration=Release
 
-    - name: Get commit count as version
-      id: get_commit_count
-      run: echo "VERSION=v1.0.$(git rev-list --count HEAD)" >> $GITHUB_ENV
+    - name: Get latest Git tag
+      id: get_tag
+      run: echo "VERSION=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
 
     - name: Create Release
       id: create_release
-      uses: gh-actions/create-release@v1
+      uses: softprops/action-gh-release@v1
       with:
-        tag_name: ${{ env.VERSION }}  # Usando a versão gerada a partir dos commits
-        release_name: "Release ${{ env.VERSION }}"
-        body: "Release baseado no commit count: ${{ env.VERSION }}"
+        tag_name: ${{ env.VERSION }}  # Usando a versão extraída pela tag
+        release_name: "Release ${{ env.VERSION }}"  # Nome do release
+        body: "Release baseado na tag ${{ env.VERSION }}"
         draft: false
         prerelease: false
       env:
