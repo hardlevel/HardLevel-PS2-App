@@ -25,6 +25,7 @@
             paramLabel = new Label();
             ipLabel = new Label();
             consoleLabel = new Label();
+            button1 = new Button();
             SuspendLayout();
             // 
             // txtExePath
@@ -136,9 +137,20 @@
             consoleLabel.TabIndex = 12;
             consoleLabel.Text = "Resultado";
             // 
+            // button1
+            // 
+            button1.Location = new Point(909, 203);
+            button1.Name = "button1";
+            button1.Size = new Size(75, 23);
+            button1.TabIndex = 13;
+            button1.Text = "button1";
+            button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click;
+            // 
             // Form1
             // 
             ClientSize = new Size(1008, 761);
+            Controls.Add(button1);
             Controls.Add(consoleLabel);
             Controls.Add(ipLabel);
             Controls.Add(paramLabel);
@@ -171,5 +183,6 @@
         private Label paramLabel;
         private Label ipLabel;
         private Label consoleLabel;
+        private Button button1;
     }
 }
