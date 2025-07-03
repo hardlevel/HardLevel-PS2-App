@@ -1,7 +1,5 @@
-using System;
+using HardLevel_PS2_App.modues.osdmenu;
 using System.Diagnostics;
-using System.IO;
-using System.Windows.Forms;
 
 namespace HardLevel_PS2_App
 {
@@ -97,6 +95,12 @@ namespace HardLevel_PS2_App
             {
                 txtOutput.AppendText(text + Environment.NewLine);
             }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            var form = new osdmenu();
+            form.ShowDialog();
         }
     }
 }
